@@ -4,7 +4,7 @@
 {% block title %}Challenge{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto space-y-8">
+<div class="max-w-4xl mx-auto space-y-8" id="challenge-page">
     <div class="bg-white p-6 rounded-lg shadow">
         <h2 class="text-2xl font-bold mb-4">Problem Description</h2>
         <div class="prose" id="challenge-description">
@@ -16,7 +16,8 @@
         <h2 class="text-2xl font-bold mb-4">Solution</h2>
         <div class="mb-4">
             <textarea id="code-editor" rows="10" 
-                      class="w-full p-4 font-mono text-sm border rounded-md">{{ challenge.starter_code }}</textarea>
+                      class="w-full p-4 font-mono text-sm border rounded-md"
+                      data-starter-code="{{ challenge.starter_code }}">{{ challenge.starter_code }}</textarea>
         </div>
         <div class="flex space-x-4">
             <button onclick="submitSolution()" 
