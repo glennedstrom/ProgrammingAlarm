@@ -1,0 +1,6 @@
+NOTES.txt
+__pycache__/
+alarm.mp3
+flask_alarm.log
+
+

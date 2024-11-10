@@ -1,0 +1,55 @@
+- function: dfs_traversal
+  description: Basic connected graph from node 2
+  input: 
+    graph: {0: [2, 1], 1: [0, 3], 2: [0, 3], 3: [1, 2], 4: [5], 5: [4]}
+    source: 2
+  expected: [2, 0, 1, 3, 4, 5]
+
+- function: dfs_traversal
+  description: Different neighbor order
+  input:
+    graph: {0: [1, 2], 1: [0, 3], 2: [0, 3], 3: [1, 2], 4: [5], 5: [4]}
+    source: 0
+  expected: [0, 1, 3, 2, 4, 5]
+
+- function: dfs_traversal
+  description: Empty graph
+  input:
+    graph: {}
+    source: 0
+  expected: []
+
+- function: dfs_traversal
+  description: Single node
+  input:
+    graph: {0: []}
+    source: 0
+  expected: [0]
+
+- function: dfs_traversal
+  description: Disconnected components
+  input:
+    graph: {0: [1], 1: [0], 2: [3], 3: [2], 4: []}
+    source: 2
+  expected: [2, 3, 0, 1, 4]
+
+- function: dfs_traversal
+  description: Linear graph with specific neighbor order
+  input:
+    graph: {0: [1], 1: [0, 2], 2: [1, 3], 3: [2]}
+    source: 1
+  expected: [1, 0, 2, 3]
+
+- function: dfs_traversal
+  description: Star graph with specific neighbor order
+  input:
+    graph: {0: [3, 1, 2], 1: [0], 2: [0], 3: [0]}
+    source: 0
+  expected: [0, 3, 1, 2]
+
+- function: dfs_traversal
+  description: Invalid source node
+  input:
+    graph: {0: [1], 1: [0]}
+    source: 2
+  expected: []
