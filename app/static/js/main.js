@@ -199,3 +199,19 @@ if (document.getElementById('alarm-form')) {
     initAudio();
     setInterval(checkAlarms, 1000);
 }
+
+async function dismissSound() {
+    try {
+        const response = await fetch('/api/dismiss-sound', {
+            method: 'POST'
+        });
+        
+        if (!response.ok) {
+            const data = await response.json();
+            alert(data.error || 'Failed to dismiss sound');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to dismiss sound');
+    }
+}

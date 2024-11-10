@@ -79,3 +79,10 @@ def list_challenges():
         "count": challenge_manager.get_challenge_count()
     })
 
+@api_bp.route('/dismiss-sound', methods=['POST'])
+def dismiss_sound():
+    """Temporarily dismiss the alarm sound."""
+    if current_app.alarm_worker:
+        current_app.alarm_worker.dismiss_sound()
+        return jsonify({"message": "Sound dismissed"})
+    return jsonify({"error": "Alarm worker not available"}), 500
