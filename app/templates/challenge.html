@@ -3,6 +3,11 @@
 
 {% block title %}Challenge{% endblock %}
 
+{% block styles %}
+<link rel="stylesheet" href="https://unpkg.com/@vscode/codicons/dist/codicon.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ace-builds@1.4.12/css/ace.css">
+{% endblock %}
+
 {% block content %}
 <div class="max-w-4xl mx-auto space-y-8" id="challenge-page">
     <div class="bg-white p-6 rounded-lg shadow">
@@ -15,9 +20,7 @@
     <div class="bg-white p-6 rounded-lg shadow">
         <h2 class="text-2xl font-bold mb-4">Solution</h2>
         <div class="mb-4">
-            <textarea id="code-editor" rows="10" 
-                      class="w-full p-4 font-mono text-sm border rounded-md"
-                      data-starter-code="{{ challenge.starter_code }}">{{ challenge.starter_code }}</textarea>
+            <div id="editor" style="height: 400px; width: 100%;">{{ challenge.starter_code }}</div>
         </div>
         <div class="flex space-x-4">
             <button onclick="submitSolution()" 
@@ -42,4 +45,94 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Add Ace and Vim mode -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/keybinding-vim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/mode-python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/theme-monokai.min.js"></script>
+<script>
+    // Store starter code for reset functionality
+    const starterCode = {{ challenge.starter_code|tojson|safe }};
+    
+    // Initialize editor
+    let editor = ace.edit("editor");
+    editor.session.setMode("ace/mode/python");
+    editor.setTheme("ace/theme/monokai");
+    editor.setKeyboardHandler("ace/keyboard/vim");
+    editor.setOptions({
+        fontSize: "14px",
+        showPrintMargin: false,
+        enableBasicAutocompletion: true,
+        enableLiveAutocompletion: true
+    });
+
+    // Submit solution function
+    async function submitSolution() {
+        const code = editor.getValue();
+        const challengeId = window.location.pathname.split('/').pop();
+        const resultsDiv = document.getElementById('test-results');
+        
+        resultsDiv.innerHTML = 'Running tests...';
+        
+        try {
+            const response = await fetch('/api/verify-solution', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    challenge_id: challengeId,
+                    solution: code,
+                }),
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                formatAndDisplayResults(data);
+                if (data.all_passed) {
+                    stopAlarm();
+                    alert('Congratulations! All tests passed. Returning to main page...');
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 2000);
+                }
+            } else {
+                resultsDiv.innerHTML = `<div class="test-result-error">Error: ${data.error}</div>`;
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            resultsDiv.innerHTML = '<div class="test-result-error">Error submitting solution</div>';
+        }
+    }
+
+    // Reset code function
+    function resetCode() {
+        if (confirm('Are you sure you want to reset your code to the starter template?')) {
+            editor.setValue(starterCode, -1); // -1 moves cursor to start
+        }
+    }
+
+    function formatAndDisplayResults(results) {
+        const resultsDiv = document.getElementById('test-results');
+        let html = '';
+        
+        results.test_results.forEach((test, index) => {
+            const resultClass = test.passed ? 'test-result-success' : 'test-result-failure';
+            html += `
+                <div class="${resultClass}">
+                    <div><strong>Test ${index + 1}:</strong> ${test.description}</div>
+                    <div>Input: ${JSON.stringify(test.input)}</div>
+                    <div>Expected: ${JSON.stringify(test.expected)}</div>
+                    <div>Got: ${JSON.stringify(test.actual)}</div>
+                </div>
+            `;
+        });
+        
+        resultsDiv.innerHTML = html;
+    }
+</script>
 {% endblock %}
