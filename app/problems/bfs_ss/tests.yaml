@@ -1,16 +1,16 @@
 - function: bfs_traversal
-  description: Basic connected graph from node 2
+  description: Basic connected component from node 2
   input: 
     graph: {0: [2, 1], 1: [0, 3], 2: [0, 3], 3: [1, 2], 4: [5], 5: [4]}
     source: 2
-  expected: [2, 0, 3, 1, 4, 5]
+  expected: [2, 0, 3, 1]
 
 - function: bfs_traversal
   description: Different neighbor order
   input:
     graph: {0: [1, 2], 1: [0, 3], 2: [0, 3], 3: [1, 2], 4: [5], 5: [4]}
     source: 0
-  expected: [0, 1, 2, 3, 4, 5]
+  expected: [0, 1, 2, 3]
 
 - function: bfs_traversal
   description: Empty graph
@@ -27,11 +27,11 @@
   expected: [0]
 
 - function: bfs_traversal
-  description: Disconnected components
+  description: Multiple components, only return reachable nodes
   input:
     graph: {0: [1], 1: [0], 2: [3], 3: [2], 4: []}
     source: 2
-  expected: [2, 3, 0, 1, 4]
+  expected: [2, 3]
 
 - function: bfs_traversal
   description: Linear graph with specific neighbor order
